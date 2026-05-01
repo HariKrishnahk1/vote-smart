@@ -27,45 +27,16 @@ const ChatbotPage = () => {
     setIsLoading(true);
 
     try {
-      // Simulating API call since API key might not be set in user's environment immediately
-      // Replace with actual Gemini call if key exists
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      let reply = "";
-      
-      if (apiKey && apiKey !== 'your_api_key_here') {
-        // Simple fetch to Gemini REST API for browser compatibility
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `You are an election guide assistant. Keep responses simple, beginner-friendly, and structured in steps. User asks: ${userMsg.content}` }] }]
-          })
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          reply = data.candidates[0].content.parts[0].text;
-        } else {
-          const errorData = await response.json();
-          reply = `API Error: ${errorData.error?.message || "I'm having trouble connecting to my brain."}`;
-        }
-      } else {
-        // Mock response if no API key
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        const lowerInput = userMsg.content.toLowerCase();
-        
-        if (lowerInput.includes('how') && lowerInput.includes('vote')) {
-          reply = "Voting is simple! Here are the steps:\n1. Check your eligibility (usually 18+ and a citizen).\n2. Register to vote online or offline.\n3. Find your polling station.\n4. Go on election day with a valid ID.\n5. Cast your vote secretly!";
-        } else if (lowerInput.includes('eligible') || lowerInput.includes('age')) {
-          reply = "To be eligible to vote, you generally need to be a citizen of the country and at least 18 years old. You must also be registered on the electoral roll.";
-        } else {
-          reply = "That's a great question about elections. The democratic process is built on participation. Remember, your vote is your voice! Please set a valid Gemini API Key in the .env file for me to give specific answers.";
-        }
-      }
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: userMsg.content }),
+      });
 
-      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+      const data = await response.json();
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (error) {
       setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please try again." }]);
     } finally {

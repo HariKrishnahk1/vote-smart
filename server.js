@@ -65,6 +65,36 @@ app.post('/api/login', (req, res) => {
   }
 });
 
+const HF_API_KEY = process.env.HF_API_KEY;
+
+app.post("/api/chat", async (req, res) => {
+  const userMessage = req.body.message;
+
+  try {
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${HF_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ inputs: userMessage }),
+      }
+    );
+
+    const data = await response.json();
+
+    res.json({
+      reply: data[0]?.generated_text || "No response",
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.json({ reply: "Error from AI" });
+  }
+});
+
 app.use(express.static('dist'));
 
 app.use((req, res) => {
