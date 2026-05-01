@@ -67,7 +67,7 @@ app.post('/api/login', (req, res) => {
 
 app.use(express.static('dist'));
 
-app.get('*', (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.resolve('dist/index.html'));
 });
 
