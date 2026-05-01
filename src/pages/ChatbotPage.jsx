@@ -17,6 +17,33 @@ const ChatbotPage = () => {
     scrollToBottom();
   }, [messages]);
 
+  const predefinedQA = [
+    {
+      q: "How do I register to vote?",
+      a: "You can register to vote online through the national voter service portal, or offline by filling out Form 6 and submitting it to your local Electoral Registration Officer. You'll need proof of age and address."
+    },
+    {
+      q: "What are the eligibility criteria?",
+      a: "To be eligible to vote, you must be a citizen of the country, at least 18 years old on the qualifying date, and not disqualified by any law. You must also be enrolled in the electoral roll of your constituency."
+    },
+    {
+      q: "Where is my polling station?",
+      a: "You can find your exact polling station by searching for your name on the electoral roll via the election commission's website or by SMS using your Voter ID number."
+    },
+    {
+      q: "What ID do I need to vote?",
+      a: "Your Voter ID card (EPIC) is the primary document. However, if you don't have it, you can usually use other approved photo IDs like an Aadhaar card, PAN card, Passport, or Driving License, provided your name is on the voter list."
+    }
+  ];
+
+  const handlePredefinedClick = (question, answer) => {
+    setMessages(prev => [
+      ...prev,
+      { role: 'user', content: question },
+      { role: 'assistant', content: answer }
+    ]);
+  };
+
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -84,6 +111,20 @@ const ChatbotPage = () => {
             </div>
           )}
           <div ref={messagesEndRef} />
+        </div>
+
+        {/* Predefined Questions */}
+        <div className="px-4 py-3 bg-slate-50 border-t border-slate-100 flex gap-2 overflow-x-auto no-scrollbar">
+          {predefinedQA.map((item, idx) => (
+            <button
+              key={idx}
+              onClick={() => handlePredefinedClick(item.q, item.a)}
+              disabled={isLoading}
+              className="whitespace-nowrap px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-primary-600 hover:bg-primary-50 hover:border-primary-200 transition-colors shadow-sm disabled:opacity-50"
+            >
+              {item.q}
+            </button>
+          ))}
         </div>
 
         {/* Input Area */}
