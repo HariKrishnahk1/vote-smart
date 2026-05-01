@@ -85,13 +85,17 @@ app.post("/api/chat", async (req, res) => {
 
     const data = await response.json();
 
+    if (data.error) {
+      return res.json({ reply: `HF API Error: ${typeof data.error === 'string' ? data.error : JSON.stringify(data.error)}` });
+    }
+
     res.json({
       reply: data[0]?.generated_text || "No response",
     });
 
   } catch (error) {
-    console.error(error);
-    res.json({ reply: "Error from AI" });
+    console.error("AI Error:", error);
+    res.json({ reply: `Error from AI: ${error.message}` });
   }
 });
 
