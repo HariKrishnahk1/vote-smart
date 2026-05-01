@@ -5,7 +5,6 @@ const ChatbotPage = () => {
   const [messages, setMessages] = useState([
     { role: 'assistant', content: 'Hello! I am your VoteSmart AI Assistant. Ask me anything about the election process, voting eligibility, or how to register!' }
   ]);
-  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
@@ -33,6 +32,22 @@ const ChatbotPage = () => {
     {
       q: "What ID do I need to vote?",
       a: "Your Voter ID card (EPIC) is the primary document. However, if you don't have it, you can usually use other approved photo IDs like an Aadhaar card, PAN card, Passport, or Driving License, provided your name is on the voter list."
+    },
+    {
+      q: "Can I vote online?",
+      a: "No, currently voting must be done in person at your designated polling station or via postal ballot if you meet specific eligibility criteria (like armed forces personnel or election duty staff)."
+    },
+    {
+      q: "How do I check my name on the voter list?",
+      a: "You can check your name on the electoral roll online through the official Election Commission portal by entering your Voter ID (EPIC) number or your personal details."
+    },
+    {
+      q: "What if my name is missing from the list?",
+      a: "If your name is missing, you cannot vote. You must submit Form 6 to register as a new voter, or contact your local Electoral Registration Officer immediately to resolve any errors."
+    },
+    {
+      q: "What is a postal ballot?",
+      a: "A postal ballot allows certain individuals, such as armed forces personnel, election duty staff, or people with disabilities, to cast their vote by mail instead of visiting a polling station."
     }
   ];
 
@@ -42,33 +57,6 @@ const ChatbotPage = () => {
       { role: 'user', content: question },
       { role: 'assistant', content: answer }
     ]);
-  };
-
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-
-    const userMsg = { role: 'user', content: input };
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: userMsg.content }),
-      });
-
-      const data = await response.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please try again." }]);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (
@@ -113,41 +101,21 @@ const ChatbotPage = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Predefined Questions */}
-        <div className="px-4 py-3 bg-slate-50 border-t border-slate-100 flex gap-2 overflow-x-auto no-scrollbar">
-          {predefinedQA.map((item, idx) => (
-            <button
-              key={idx}
-              onClick={() => handlePredefinedClick(item.q, item.a)}
-              disabled={isLoading}
-              className="whitespace-nowrap px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-primary-600 hover:bg-primary-50 hover:border-primary-200 transition-colors shadow-sm disabled:opacity-50"
-            >
-              {item.q}
-            </button>
-          ))}
-        </div>
-
-        {/* Input Area */}
-        <div className="p-4 bg-white border-t border-slate-100">
-          <form onSubmit={handleSend} className="relative flex items-center">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="E.g. How do I register to vote?"
-              className="w-full bg-slate-50 border border-slate-200 rounded-full py-3 pl-6 pr-14 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-              disabled={isLoading}
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !input.trim()}
-              className="absolute right-2 p-2 bg-primary-600 hover:bg-primary-700 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Send size={18} className={isLoading ? "opacity-0" : ""} />
-              {isLoading && <Loader2 size={18} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin" />}
-            </button>
-          </form>
-          <p className="text-center text-xs text-slate-400 mt-2">AI can make mistakes. Verify important election details.</p>
+        {/* Predefined Questions Area */}
+        <div className="p-4 bg-slate-50 border-t border-slate-100">
+          <p className="text-xs text-slate-500 font-medium mb-3 uppercase tracking-wider text-center">Select a question</p>
+          <div className="flex flex-wrap justify-center gap-2 max-h-[200px] overflow-y-auto custom-scrollbar pb-2">
+            {predefinedQA.map((item, idx) => (
+              <button
+                key={idx}
+                onClick={() => handlePredefinedClick(item.q, item.a)}
+                disabled={isLoading}
+                className="px-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-primary-600 hover:bg-primary-50 hover:border-primary-300 transition-all shadow-sm disabled:opacity-50 text-left"
+              >
+                {item.q}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
